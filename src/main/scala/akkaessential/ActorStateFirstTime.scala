@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 
 import scala.collection.mutable.ListBuffer
 
-object ActorState {
+object ActorStateFirstTime {
   def numberWord: Behavior[String] = Behaviors.setup{ context =>
     val wordsBuffer = ListBuffer[String]()
     def splitWord(pMessage: String) = pMessage.split(" ")
