@@ -1,9 +1,9 @@
 package akkaessential.child
 
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
 import akkaessential.child.StopActors.Child.Message
-import akkaessential.child.StopActors.Parent.{CreateChild, StopChild, TellChild}
+import akkaessential.child.StopActors.Parent.{CreateChild, StopChild, TellChild, WatchChild}
 
 object StopActors {
 
@@ -12,10 +12,11 @@ object StopActors {
     case class CreateChild(name: String) extends Command
     case class TellChild(name: String, message: String) extends Command
     case class StopChild(name: String) extends Command
+    case class WatchChild(name: String) extends Command
 
     def apply(): Behavior[Command] = createChild(Map())
 
-    def createChild(children: Map[String, ActorRef[Message]]):Behavior[Command] = Behaviors.receive{ (context, message) =>
+    def createChild(children: Map[String, ActorRef[Message]]):Behavior[Command] = Behaviors.receive[Command]{ (context, message) =>
       message match
         case CreateChild(name) =>
           context.log.info(s"[parent] Creating a child with name $name")
@@ -28,10 +29,22 @@ object StopActors {
 
         case StopChild(name) =>
           val childOption = children.get(name)
-           context.log.info(s"[parent] attempting to stop child with name $name")
+          context.log.info(s"[parent] attempting to stop child with name $name")
           childOption.fold(context.log.info(s"[parent] child $name could not be found"))(child => context.stop(child))
           createChild(children - name)
-          //Behaviors.same
+
+        case WatchChild(name) =>
+          val childOption = children.get(name)
+          context.log.info(s"[parent] watching the child with name $name")
+          childOption.fold(context.log.info(s"[parent] child $name could not be found"))(child => context.watch(child))
+          Behaviors.same
+
+    }.receiveSignal{
+      case(context, Terminated(ref)) =>
+        context.log.info(s"Child ${ref.path} was stopped")
+        val childName = ref.path.name
+
+        createChild(children - childName)
     }
 
   }
@@ -55,6 +68,7 @@ object StopActors {
 
       parent ! TellChild("andre", "hello")
 
+      parent ! WatchChild("lucas")
       parent ! StopChild("lucas")
 
       parent ! TellChild("lucas", "Can you hear me ?")
