@@ -13,7 +13,3 @@ class CreditCard0:
 class Coffee0:
   val price: Double = 2.0
 
-val cc = CreditCard0()
-val cafe = Cafe0()
-val cup = cafe.buyCoffee(cc)
-

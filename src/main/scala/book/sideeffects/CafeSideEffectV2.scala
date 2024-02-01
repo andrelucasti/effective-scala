@@ -4,7 +4,7 @@ package book.sideeffects
 
 class Cafe2:
   // is possible now to use a mock framework
-  def buyCoffee(cc: CreditCard2, p: Payment): Coffee2 = 
+  def buyCoffee2(cc: CreditCard2, p: Payment): Coffee2 = 
     // But there's a difficult to reuse buyCoffee, 
     // I want to buy 12 cups of coffee, how i can do that?
     val cup = Coffee2()
@@ -23,8 +23,8 @@ class SimulatePayments extends Payment:
 class Coffee2:
   val price: Double = 2.0
 
-val cc = CreditCard2()
-val p =  SimulatePayments()
-val cafe = Cafe2()
-val cup = cafe.buyCoffee(cc, p)
+//val cc = CreditCard2()
+//val p =  SimulatePayments()
+//val cafe = Cafe2()
+//val cup = cafe.buyCoffee(cc, p)
 
