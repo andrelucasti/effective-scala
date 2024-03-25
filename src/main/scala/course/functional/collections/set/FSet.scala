@@ -1,6 +1,12 @@
 package course.functional.collections.set
 
-abstract class FSet[A]{
+abstract class FSet[A] extends (A => Boolean){
+  infix def + (elem: A) : FSet[A]
+  infix def ++ (anotherSet: FSet[A]): FSet[A]
+
+  def contains(elem: A): Boolean
+  def apply(elem: A): Boolean = contains(elem)
+
   def head : A
   def tail : FSet[A]
 
@@ -11,6 +17,11 @@ abstract class FSet[A]{
 }
 
 case class EmptySet[A]() extends FSet[A]:
+  override infix def +(elem: A): FSet[A] = FunctionalSuperSet(elem, this)
+
+  override infix def ++(anotherSet: FSet[A]): FSet[A] = anotherSet
+
+  override def contains(elem: A): Boolean = false
   override def head: A = throw new  NoSuchElementException()
   override def tail: FSet[A] = this
 
@@ -22,6 +33,13 @@ case class EmptySet[A]() extends FSet[A]:
 
 case class FunctionalSuperSet[A](override val head: A,
                                  override val tail: FSet[A]) extends FSet[A]:
+
+  override infix def +(elem: A): FSet[A] = FunctionalSuperSet(elem, this)
+
+  override infix def ++(anotherSet: FSet[A]): FSet[A] = FunctionalSuperSet(head, tail ++ anotherSet)
+  override def contains(elem: A): Boolean =
+    if elem == head then true
+    else tail.contains(elem)
 
   override def map[B](f: A => B): FSet[B] = this match
     case FunctionalSuperSet(head, tail) => FunctionalSuperSet(f(head), tail.map(f))
@@ -54,9 +72,11 @@ object FunctionalSuperSet {
     println(names.filter(_.equals("Santos")))
     println(names.map(n => n.toUpperCase))
 
-    names.foreach(
-      println(_)
-    )
+    val names2 = FunctionalSuperSet("Andre" + "Lucas", EmptySet())
+    val names3 = names2 ++ names
+
+
+    names3.foreach(println(_))
   }
 }
 
