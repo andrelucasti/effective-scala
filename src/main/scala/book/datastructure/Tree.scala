@@ -19,10 +19,14 @@ object Tree:
         if leftPos > 0 then leftPos
         else right.firstPositive
 
+    def maximum: Int = tree match
+      case Leaf(value) => value
+      case Branch(left, right) => left.maximum.max(right.maximum)
+
   def main(args: Array[String]): Unit = {
     val b = Branch(Leaf("Andre"), Leaf("Lucas"))
 
-    val firstPositive = Branch(
+    val numbers = Branch(
       Branch(
         Leaf(-50),
         Branch(
@@ -36,6 +40,7 @@ object Tree:
       )
     )
 
-    println(firstPositive.firstPositive)
+    println(numbers.firstPositive)
     println(b.size)
+    println(numbers.maximum)
   }
