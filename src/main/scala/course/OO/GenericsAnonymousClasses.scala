@@ -66,7 +66,7 @@ object GenericsAnonymousClasses {
                           new MyLinkedList[String]("Silva", new EmptyList[String]))))
 
 
-    println(llNames.head)
+    println(llNames)
 
 
     val charsCounted = llNames.map(transformer = countChars_v2)
